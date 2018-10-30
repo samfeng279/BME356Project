@@ -87,9 +87,17 @@ if(length(LOCS) > 1)
         a = 4 / (0.3*LOCS(1)+0.7*settlingTime);
         s = tf('s');
         if(sugar_vec(1) < 145)
-            factor = 1.132;
+            if(w>0.01 && z>0.48)
+                factor = 1.131;
+            else
+                factor = 1.132;
+            end
         elseif(sugar_vec(1) < 170)
-            factor = 1.135;
+            if(w>0.01 && z>0.48)
+                factor = 1.132;
+            else
+                factor = 1.1354;
+            end
         else
             factor = 1.138;
         end
