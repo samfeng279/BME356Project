@@ -24,13 +24,9 @@ sugar_vec = interp1(Sugar.Time,Sugar.Data,time_vec,'linear');
 %Find the peaks in the data, this is when the slope changes sign
 [PKS, LOCS] = findpeaks(-1*sugar_vec,time_vec);
 
-%Fine the min and max 
+%Find the min and max 
 min_val = min(sugar_vec);
 max_val = max(sugar_vec);
-
-%In the example we ignore the peaks, min and max and just output a first order 
-%response shifted by 160 
-%Produce first order transfer function as output
 
 %find settling time
 final = sugar_vec(end);
@@ -43,7 +39,7 @@ for i = 1:length(sugar_vec)
     end
 end
 
-%find rise time (not used currently as the result sucks) 
+%find rise time (not currently used)
 flipped = -1*sugar_vec;
 flipped = flipped - min(flipped);
 final = flipped(end);
@@ -58,11 +54,9 @@ for i = 1:length(sugar_vec)
         t90 = i;
     end
 end
-
 riseTime = t90 - t10;
 
 %find zeta and wn
-
 syms zeta wn
 if(length(LOCS) > 1)
     peakTime = LOCS(1);
@@ -72,18 +66,14 @@ if(length(LOCS) > 1)
     X = solve([eqn1, eqn2], [zeta, wn]);
     z = double(X.zeta);
     w = double(X.wn);
-    z
-    w
     
     s = tf('s');
-    % TF = -80*(4/(10*60))/(s+4/(10*60));
 
     %produce transfer functions
     if(z>0.7)
         TF = ((max_val-min_val)*(-(w^2)))/(((s^2)+(2*z*w*s)+(w^2))*(1+z^3*s/w));
         IC = sugar_vec(1);
     else 
-        %TF = ((max_val-min_val)*(-(w^2)))/(((s^2)+(2*z*w*s)+(w^2))*(1/w*s+1));
         a = 4 / (0.3*LOCS(1)+0.7*settlingTime);
         s = tf('s');
         if(sugar_vec(1) < 145)
@@ -110,13 +100,5 @@ else
     TF = (-a*(max_val-min_val))/(s+a);
     IC = sugar_vec(1);
 end
-
-%Produce initial condition (offset from zero)
-
-%second order underdamped system, flipped
-%1) first peak -- find peak time (first equation for zeta and wn)
-%2) after last peak -- find when slope gets close enough to zero and this
-%is settling time (second equation for zeta and wn) 
-%time vector: each index represents an minute
 
 end
